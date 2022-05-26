@@ -7,7 +7,7 @@ COPY . .
 RUN rustup default 1.59.0
 RUN cargo build --release
 
-EXPOSE 4100
+EXPOSE 5000
 
 WORKDIR /usr/src/doc-service
 

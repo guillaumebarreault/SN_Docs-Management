@@ -1,6 +1,5 @@
 use actix_web::{web, App, HttpServer};
 
-
 mod handlers;
 
 
@@ -10,11 +9,11 @@ async fn main() -> std::io::Result<()> {
     // Start http server
     HttpServer::new(move || {
         App::new()
-			.route("/minio", web::post().to(handlers::minio_api))
+            .route("/minio", web::post().to(handlers::minio_api))
 			//.route("/web-user-interface", web::post().to())
     })
-    .bind("127.0.0.1:8080")?
-	//.bind("0.0.0.0:4100")?
+    //.bind("127.0.0.1:8080")?
+	.bind("0.0.0.0:5000")?
     .run()
     .await
 }
