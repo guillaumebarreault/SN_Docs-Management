@@ -19,12 +19,12 @@ pub struct InputDoc {
 
 
 // 
-pub async fn minio_api(item: web::json<InputDoc>) {
+pub async fn minio_api(item: web::Json<InputDoc>) -> impl Responder {
 	let uid = &item.uid;
 	let doc_name = &item.doc_name;
 	let content_doc = &item.content_doc;
 	
-	instantiate_bucket(uid, doc_name, content_doc);
+	instantiate_bucket(uid, doc_name, content_doc.to_vec());
 }
 
 
