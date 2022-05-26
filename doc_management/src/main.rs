@@ -12,8 +12,7 @@ async fn main() -> std::io::Result<()> {
             .route("/minio", web::post().to(handlers::minio_api))
 			//.route("/web-user-interface", web::post().to())
     })
-    //.bind("127.0.0.1:8080")?
-	.bind("0.0.0.0:5000")?
+	.bind("0.0.0.0:5100")?
     .run()
     .await
 }
