@@ -14,7 +14,8 @@ pub struct InputDoc {
     pub uid: String,
 	//pub token: String,
     pub doc_name: String,
-	pub content_doc: Vec<u8>,
+	pub content_doc: String,
+	//pub content_doc: Vec<u8>,
 }
 
 
@@ -23,8 +24,8 @@ pub async fn minio_api(item: web::Json<InputDoc>) -> impl Responder {
 	let uid = &item.uid;
 	let doc_name = &item.doc_name;
 	let content_doc = &item.content_doc;	
-	instantiate_bucket(uid, doc_name, content_doc.to_vec());
-	format!("File Uploaded to MinIO")
+	instantiate_bucket(uid, doc_name, content_doc.as_bytes().to_vec()).await;
+	format!("\nFile Uploaded to MinIO")
 }
 
 
@@ -59,7 +60,7 @@ pub async fn instantiate_bucket(bucket_name: &str, key: &str, content_object: Ve
 	println!("\n{} already created", bucket.name);
 
 	
-	put_content_bucket(&bucket, key, content_object);	
+	put_content_bucket(&bucket, key, content_object).await;	
 	//let list = list_bucket_content(&bucket);
 	let data = get_content_bucket(&bucket, key);
 	

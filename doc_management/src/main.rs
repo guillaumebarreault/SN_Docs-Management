@@ -9,7 +9,7 @@ async fn main() -> std::io::Result<()> {
     // Start http server
     HttpServer::new(move || {
         App::new()
-            .route("/minio", web::post().to(handlers::minio_api))
+            .route("/miniopush", web::post().to(handlers::minio_api))
 			//.route("/web-user-interface", web::post().to())
     })
 	.bind("0.0.0.0:5100")?
