@@ -12,7 +12,6 @@ use s3::BucketConfiguration;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct InputDoc {
     pub uid: String,
-	//pub token: String,
     pub doc_name: String,
 	pub content_doc: String,
 	//pub content_doc: Vec<u8>,
