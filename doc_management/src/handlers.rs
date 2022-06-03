@@ -1,6 +1,7 @@
 use actix_web::Responder;
 use actix_web::{web};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use s3::region::Region;
@@ -18,7 +19,7 @@ pub struct InputDoc {
 }
 
 
-// 
+// for push document on minio
 pub async fn minio_api(item: web::Json<InputDoc>) -> impl Responder {
 	let uid = &item.uid;
 	let doc_name = &item.doc_name;
@@ -28,6 +29,7 @@ pub async fn minio_api(item: web::Json<InputDoc>) -> impl Responder {
 }
 
 
+
 // Instantiate the bucket client
 pub async fn instantiate_bucket(bucket_name: &str, key: &str, content_object: Vec<u8>) -> Vec<u8> {
 	// Init bucket and minio route
@@ -35,7 +37,7 @@ pub async fn instantiate_bucket(bucket_name: &str, key: &str, content_object: Ve
 		bucket_name,
 		Region::Custom {
 			region: "".to_owned(),
-			endpoint: "http://127.0.0.1:9000".to_owned(),
+			endpoint: "0.0.0.0:9000".to_owned(),
 		},
 		Credentials {
 			access_key: Some("minio".to_owned()), // get of /etc/default/minio
@@ -60,10 +62,54 @@ pub async fn instantiate_bucket(bucket_name: &str, key: &str, content_object: Ve
 
 	
 	put_content_bucket(&bucket, key, content_object).await;	
-	//let list = list_bucket_content(&bucket);
+	
 	let data = get_content_bucket(&bucket, key);
 	
 	return data.await;
+}
+
+
+// for pull content of bucket and display
+pub async fn minio_get(item: web::Json<InputDoc>) -> impl Responder {
+	let uid = &item.uid;
+	let doc_name = &item.doc_name;	
+	link_bucket(uid, doc_name).await;
+	format!("\nInit to get contents of MinIO")
+}
+
+
+pub async fn link_bucket(bucket_name: &str, key: &str) {
+	let bucket = Bucket::new_with_path_style(
+		bucket_name,
+		Region::Custom {
+			region: "".to_owned(),
+			endpoint: "0.0.0.0:9000".to_owned(),
+		},
+		Credentials {
+			access_key: Some("minio".to_owned()), // get of /etc/default/minio
+			secret_key: Some("SN-minio-serv".to_owned()), // get of /etc/default/minio
+			security_token: None,
+			session_token: None,
+		},
+	).unwrap();
+
+	list_bucket_content(&bucket);
+
+	let content = get_content_bucket(&bucket, key);
+
+
+	// convert in string
+	let mycontent = String::from_utf8(content.await).unwrap();
+	// send json 
+	let mut map = HashMap::new();
+	map.insert("name_file", key);
+	map.insert("content_file", mycontent);
+
+	let client = reqwest::Client::new();
+	let res = client.post("0.0.0.0:3000")
+		.json(&map)
+		.send()
+		.await.unwrap();
 }
 
 

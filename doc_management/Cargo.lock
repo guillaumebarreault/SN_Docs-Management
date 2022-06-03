@@ -534,6 +534,7 @@ dependencies = [
  "actix-web",
  "chrono",
  "derive_more",
+ "reqwest",
  "rust-s3",
  "serde",
  "serde_json",
